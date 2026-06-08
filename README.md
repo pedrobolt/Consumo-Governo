@@ -95,37 +95,21 @@ python run.py --year-start 2010 --year-end 2024
 
 ---
 
-## Resultados
+## Status
 
-### Métricas do Melhor Modelo (2010-2024)
+**Aguardando dados reais.** A infraestrutura de desagregação e validação está pronta.
+Resultados serão publicados após download dos dados reais conforme `DATA_ACQUISITION.md`.
 
-| Métrica | Valor | Target |
-|---------|-------|--------|
-| MAPE | **1.89%** | < 2% ✓ |
-| Correlação | **0.9981** | > 0.98 ✓ |
-| RMSE | 8.77 bi | — |
-| Theil U1 | 0.0112 | < 0.1 ✓ |
-| Max. desvio | 5.38% | — |
+### Verificação contra o paper (Santos et al. 2015, Tabela 2)
 
-### Replicação do Paper (2010-2014, Tabela 2)
+Os valores abaixo constam do paper original e são usados como referência para
+verificar a integridade dos dados após download:
 
-| Trimestre | CNT (bi) | Estimada (bi) | Desvio |
-|-----------|----------|---------------|--------|
-| 2011/3    | 199.00   | 188.30        | -5.38% |
-| 2010/1    | 163.11   | 169.90        | +4.16% |
-| 2014/4    | 324.89   | 325.00        | +0.03% |
-
-**Verificação automática**: desvio máximo 2010-2014 = 5.38% (idêntico ao paper ✓)
-
-### Top 5 Especificações (por RMSE)
-
-| Rank | Modelo | RMSE | MAPE | Corr |
-|------|--------|------|------|------|
-| 1 | serie8_pro_rata | 8.77 | 1.89% | 0.9981 |
-| 2 | serie8_denton_prop | 9.72 | 2.12% | 0.9976 |
-| 3 | serie8_denton_prop_d2 | 9.73 | 2.12% | 0.9976 |
-| 4 | serie6_pro_rata | 9.74 | 2.12% | 0.9976 |
-| 5 | moderna_a_pro_rata | 10.00 | 2.10% | 0.9975 |
+| Trimestre | CNT real (R$ bi) | Série 13 estimada (R$ bi) | Desvio |
+|-----------|-----------------|--------------------------|--------|
+| 2011/3    | 199.00          | 188.30                   | -5.38% |
+| 2010/1    | 163.11          | 169.90                   | +4.16% |
+| 2014/4    | 324.89          | 325.00                   | +0.03% |
 
 ---
 
@@ -139,7 +123,8 @@ python run.py --year-start 2010 --year-end 2024
 | Sal.+CE Municípios | RREO (SISTN) | SICONFI | Bimestral |
 | Benchmark | CNT IBGE Ref.2010 | CNT IBGE mais recente | Trimestral |
 
-**Nota**: Em ambiente sem acesso à rede, o pipeline usa dados sintéticos calibrados com os valores exatos do paper (Tabela 2 e Tabela 3). Com acesso à rede, as APIs IBGE/SICONFI são consultadas automaticamente.
+**Nota**: Todos os downloads devem ser realizados fora do container conforme `DATA_ACQUISITION.md`.
+Os arquivos resultantes devem ser colocados em `data/raw/` antes de executar o pipeline.
 
 ---
 
