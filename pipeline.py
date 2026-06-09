@@ -170,18 +170,22 @@ def disaggregate_all(indicator_dict: Dict[str, pd.Series],
 def validate_all(estimates: Dict[str, pd.Series],
                  cnt_quarterly: pd.Series) -> pd.DataFrame:
     """Calcula métricas para todos os modelos contra CNT publicada real."""
-    forecasts_dict = {}
+    aligned_series: Dict[str, pd.Series] = {}
     for name, series in estimates.items():
         aligned = series.reindex(cnt_quarterly.index).dropna()
         if len(aligned) < 8:
             continue
-        forecasts_dict[name] = aligned.values
+        aligned_series[name] = aligned
 
-    actual = cnt_quarterly.reindex(
-        pd.Index(list(forecasts_dict.values())[0]) if forecasts_dict else cnt_quarterly.index
-    ).values if forecasts_dict else cnt_quarterly.values
+    if not aligned_series:
+        return pd.DataFrame()
 
-    actual = cnt_quarterly.values
+    # Use the index of the first series as the common evaluation window
+    eval_index = next(iter(aligned_series.values())).index
+    actual = cnt_quarterly.reindex(eval_index).values
+    forecasts_dict = {name: s.reindex(eval_index).values for name, s in aligned_series.items()}
+
+    OUTPUT_TABLES.mkdir(parents=True, exist_ok=True)
     metrics_df = compare_models(actual, forecasts_dict)
     metrics_df.to_csv(OUTPUT_TABLES / "metricas_completas.csv", float_format="%.4f")
     return metrics_df
@@ -218,3 +222,7 @@ def run_pipeline(cnt_csv: str = "data/raw/cnt_quarterly.csv",
             plot_pct_errors(cnt_quarterly, best_series.reindex(cnt_quarterly.index))
             plot_specification_ranking(metrics_df.reset_index())
             plot_metrics_heatmap(metrics_df.reset_index().head(20))
+
+
+if __name__ == '__main__':
+    run_pipeline()
