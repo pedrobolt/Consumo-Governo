@@ -40,12 +40,12 @@ logger = logging.getLogger(__name__)
 # Mapeamento bimestre → trimestres
 # ──────────────────────────────────────────────────────────────────────────────
 BIMESTRE_TO_TRIM = {
-    1: (1, 1),   # Bim 1 (jan-fev) → Q1 (inteiro)
-    2: (1, 2),   # Bim 2 (mar-abr) → ½Q1 + ½Q2
-    3: (2, 2),   # Bim 3 (mai-jun) → Q2 (inteiro)
-    4: (2, 3),   # Bim 4 (jul-ago) → ½Q2 + ½Q3
-    5: (3, 3),   # Bim 5 (set-out) → Q3 (inteiro)
-    6: (3, 4),   # Bim 6 (nov-dez) → ½Q3 + ½Q4
+    1: (1, 1),   # Bim 1 (jan-fev) → Q1 entirely
+    2: (1, 2),   # Bim 2 (mar-abr) → ½Q1 + ½Q2  (mar=Q1, abr=Q2)
+    3: (2, 2),   # Bim 3 (mai-jun) → Q2 entirely
+    4: (3, 3),   # Bim 4 (jul-ago) → Q3 entirely  (both months are Q3)
+    5: (3, 4),   # Bim 5 (set-out) → ½Q3 + ½Q4  (set=Q3, out=Q4)
+    6: (4, 4),   # Bim 6 (nov-dez) → Q4 entirely
 }
 
 # ──────────────────────────────────────────────────────────────────────────────

@@ -273,9 +273,9 @@ Once SICONFI bimestral data is downloaded, apply this conversion in `src/process
 | Bim 1 (jan-fev) | Jan, Fev | → 100% Q1 |
 | Bim 2 (mar-abr) | Mar, Abr | → 50% Q1 + 50% Q2 |
 | Bim 3 (mai-jun) | Mai, Jun | → 100% Q2 |
-| Bim 4 (jul-ago) | Jul, Ago | → 50% Q2 + 50% Q3 |
-| Bim 5 (set-out) | Set, Out | → 100% Q3 |
-| Bim 6 (nov-dez) | Nov, Dez | → 50% Q3 + 50% Q4 |
+| Bim 4 (jul-ago) | Jul, Ago | → 100% Q3 |
+| Bim 5 (set-out) | Set, Out | → 50% Q3 + 50% Q4 |
+| Bim 6 (nov-dez) | Nov, Dez | → 100% Q4 |
 
 ---
 
