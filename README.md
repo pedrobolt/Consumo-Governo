@@ -15,12 +15,39 @@ como indicador temporal com o método Chow-Lin.
 
 | Modelo | RMSE (R$ bi) | MAPE | Corr |
 |--------|-------------|------|------|
-| `spec_estados_sal_ce_chow_lin` | 12,51 | **2,39%** | 0,9912 |
-| `spec_estados_sal_ce_fernandez` | 12,55 | 2,39% | 0,9912 |
-| `spec_estados_sal_ce_pro_rata` | 12,30 | 2,40% | 0,9916 |
-| `spec13_uniao_estados_sal_ce_ci_chow_lin` | 17,59 | 3,42% | 0,9827 |
+| `spec_estados_sal_ce_litterman` | 12,22 | **2,25%** | 0,9938 |
+| `spec_estados_sal_ce_chow_lin`  | 12,26 | 2,35% | 0,9937 |
+| `spec_estados_sal_ce_fernandez` | 12,79 | 2,40% | 0,9934 |
 
-Avaliação sobre 40 trimestres (2015Q1–2024Q4) contra CNT publicada (IBGE FTP).
+Avaliacao sobre 44 trimestres (2015Q1-2025Q4) contra CNT publicada (IBGE FTP).
+
+---
+
+## Nowcast
+
+O nowcast de 2026Q2 e **estimativa provisoria**. O pipeline extrapola alem do
+ultimo benchmark anual publicado (2025) usando o relacionamento estimado entre
+o indicador fiscal (spec03 Uniao+estados) e o consumo trimestral.
+
+| Trimestre | Litterman (R$ bi) | Chow-Lin (R$ bi) | Status |
+|-----------|------------------|-----------------|--------|
+| 2026Q1 | 557,30 | 578,80 | Verificado - CNT publicado: **598,99** (erro: -7,0% / -3,4%) |
+| **2026Q2** | **615,90** | **641,14** | **PROVISIONAL** - sera benchmarkado quando IBGE publicar |
+
+**Cobertura do indicador para 2026Q2**: apenas Bim2 (mar-abr) disponivel no
+SICONFI em 2026-06-09. Bim3 (mai-jun) ainda nao publicado. O valor parcial de
+Bim2 foi escalado pelo ratio historico medio Bim2x0,5 / Q2_completo = 0,3136.
+
+Esta estimativa sera automaticamente revisada quando Bim3 2026 for publicado
+pelo Tesouro Nacional (previsao: agosto 2026).
+
+Para atualizar o nowcast quando Bim3 for publicado:
+
+```bash
+python scripts/fetch_2026_bim.py   # busca Bim3 quando disponivel
+python scripts/build_siconfi_fiscal.py
+python scripts/nowcast_2026q2.py
+```
 
 ---
 

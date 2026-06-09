@@ -70,7 +70,10 @@ def load_cnt_real(path: str = "data/raw/cnt_quarterly.csv") -> Tuple[pd.Series, 
     df = df.sort_values("data").set_index("data")
 
     cnt_quarterly = df["cnt_nominal_bi"]
-    cnt_annual = df.groupby("ano")["cnt_nominal_bi"].sum()
+    # Only include years with all 4 quarters as annual benchmarks
+    qcount = df.groupby("ano")["cnt_nominal_bi"].count()
+    complete_years = qcount[qcount == FREQ].index
+    cnt_annual = df.groupby("ano")["cnt_nominal_bi"].sum().loc[complete_years]
     return cnt_quarterly, cnt_annual
 
 
