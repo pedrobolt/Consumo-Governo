@@ -1,4 +1,48 @@
+# ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
-*.pyc
-data/raw/*.json
-data/raw/*.parquet
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.env
+.venv
+venv/
+env/
+
+# ── Raw / processed data (large, derived from public APIs) ────────────────────
+data/raw/
+data/processed/
+data/output/
+
+# ── R artefacts ───────────────────────────────────────────────────────────────
+*.rds
+*.RData
+.Rproj.user/
+renv/library/
+renv/.cache/
+portal_zips/
+
+# ── Large binary downloads ────────────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.parquet
+
+# ── Editor / OS ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Claude Code internal ──────────────────────────────────────────────────────
+.claude/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb

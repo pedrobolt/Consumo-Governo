@@ -1,165 +1,143 @@
-# Consumo do Governo Nominal Trimestral – Brasil (2010-2024)
+# Estimação Trimestral do Consumo Nominal do Governo
 
-Replicação, validação, modernização e superação da metodologia do paper:
-
-> Santos et al. (2015) — **"Uma Metodologia Simplificada de Estimação do Consumo do Governo Nominal em Bases Trimestrais"**, Nota Técnica Ipea/Dimac.
+Replicação e extensão da metodologia do IPEA — Santos et al. (2015) — para estimação do
+consumo final nominal das administrações públicas em bases trimestrais, atualizada para o
+período 2015-2024 com dados do SICONFI (Tesouro Nacional) e CNT/IBGE. O pipeline baixa
+automaticamente os dados via API, constrói séries indicadoras de despesas de pessoal por
+esfera de governo, aplica seis métodos de desagregação temporal e valida as estimativas
+contra a série publicada pelo IBGE. O melhor modelo alcança **MAPE 2,39% e correlação
+0,9912** sobre 40 trimestres (2015Q1–2024Q4), usando despesas de pessoal dos 27 estados
+como indicador temporal com o método Chow-Lin.
 
 ---
 
-## Objetivo
+## Resultado principal
 
-Construir a **melhor série possível** de Consumo do Governo Nominal Trimestral para o Brasil entre 2010 e o período mais recente disponível, utilizando dados públicos atuais, demonstrando empiricamente por que a especificação final é superior à metodologia original.
+| Modelo | RMSE (R$ bi) | MAPE | Corr |
+|--------|-------------|------|------|
+| `spec_estados_sal_ce_chow_lin` | 12,51 | **2,39%** | 0,9912 |
+| `spec_estados_sal_ce_fernandez` | 12,55 | 2,39% | 0,9912 |
+| `spec_estados_sal_ce_pro_rata` | 12,30 | 2,40% | 0,9916 |
+| `spec13_uniao_estados_sal_ce_ci_chow_lin` | 17,59 | 3,42% | 0,9827 |
+
+Avaliação sobre 40 trimestres (2015Q1–2024Q4) contra CNT publicada (IBGE FTP).
 
 ---
 
-## Estrutura do Projeto
+## Estrutura do projeto
 
 ```
 .
-├── run.py                  # Ponto de entrada
-├── pipeline.py             # Pipeline principal (6 fases)
-├── config.py               # Configurações centrais
+├── pipeline.py                  # Ponto de entrada principal
+├── config.py                    # Configurações (anos, caminhos, constantes)
 ├── requirements.txt
+├── scripts/
+│   ├── download_cnt.py          # Baixa CNT trimestral do FTP do IBGE
+│   ├── download_siconfi_rreo.py # Baixa RREO Anexo 1 (pessoal) via SICONFI API
+│   ├── download_siconfi_rpps.py # Baixa RREO Anexo 4 (contrib. imputada)
+│   ├── build_siconfi_fiscal.py  # Converte bimestral->trimestral, monta specs
+│   ├── verify_data.py           # Verificacoes de integridade dos dados
+│   └── make_outputs.py          # Gera tabelas e graficos finais
 ├── src/
-│   ├── data/
-│   │   ├── ibge_api.py         # API IBGE CNT (com fallback)
-│   │   ├── siconfi_api.py      # API SICONFI RREO (com fallback)
-│   │   └── synthetic.py        # Dados sintéticos calibrados (paper Tabela 2)
-│   ├── processing/
-│   │   └── indicator.py        # Construção das séries indicadoras (13 specs + ext.)
 │   ├── disaggregation/
-│   │   ├── denton.py           # Denton proporcional/aditivo (estável para n=60)
-│   │   └── regression_based.py # Chow-Lin, Fernandez, Litterman
+│   │   ├── denton.py            # Denton proporcional/aditivo/2a diferenca + pro-rata
+│   │   └── regression_based.py  # Chow-Lin, Fernandez, Litterman
 │   ├── validation/
-│   │   └── metrics.py          # RMSE, MAE, MAPE, Theil U, correlação
+│   │   └── metrics.py           # RMSE, MAE, MAPE, Theil U, correlacao
 │   └── reporting/
-│       ├── charts.py           # 6 gráficos + dashboard
-│       └── reports.py          # Relatórios textuais (6 agentes)
-├── data/
-│   ├── raw/                # Dados brutos (cache de APIs)
-│   ├── processed/
-│   └── output/
-└── output/
-    ├── charts/             # 6 figuras matplotlib
-    ├── tables/             # Métricas completas (CSV)
-    └── series/             # Série final (CSV)
+│       ├── charts.py            # Graficos matplotlib
+│       └── reports.py           # Relatorios textuais
+├── output/
+│   ├── tables/
+│   │   ├── ranking_final.csv    # 40 modelos ranqueados por MAPE
+│   │   ├── diagnostico_gap.csv  # Metricas por janela temporal
+│   │   └── desvios_trimestre.csv
+│   └── charts/
+│       ├── cnt_vs_best_estimate.png
+│       └── desvios_percentuais.png
+└── data/
+    └── raw/                     # Gerado pelos scripts de download (nao versionado)
 ```
 
 ---
 
-## Como Usar
+## Como reproduzir
+
+### 1. Dependencias
 
 ```bash
-# Instalação
 pip install -r requirements.txt
-
-# Pipeline completo (2010-2024)
-python run.py
-
-# Teste rápido (2010-2014)
-python run.py --test
-
-# Sem loop de otimização
-python run.py --no-loop
-
-# Período personalizado
-python run.py --year-start 2010 --year-end 2024
 ```
+
+### 2. Download dos dados
+
+```bash
+# CNT trimestral (IBGE FTP -- ~5 MB)
+python scripts/download_cnt.py
+
+# RREO Anexo 1 -- pessoal e encargos (~2 430 requisicoes, ~10 min)
+python scripts/download_siconfi_rreo.py --entes uniao,estados
+
+# RREO Anexo 4 -- contribuicao imputada RPPS
+python scripts/download_siconfi_rpps.py --dump-raw
+```
+
+### 3. Construir indicadores e validar
+
+```bash
+python scripts/build_siconfi_fiscal.py
+python scripts/verify_data.py
+```
+
+### 4. Executar pipeline completo
+
+```bash
+python pipeline.py
+```
+
+### 5. Gerar tabelas e graficos
+
+```bash
+python scripts/make_outputs.py
+```
+
+---
+
+## Fontes de dados
+
+| Variavel | Fonte | Endpoint |
+|----------|-------|---------|
+| Consumo final das administracoes publicas | IBGE CNT | FTP IBGE -- `Tab_Compl_CNT.zip` |
+| Pessoal e encargos -- Uniao e estados | SICONFI / Tesouro Nacional | `apidatalake.tesouro.gov.br/ords/siconfi/tt/rreo` |
+| Contribuicao imputada RPPS -- Uniao | SICONFI Anexo 4 | mesma API, `no_co_tipo_demonstrativo=RREO - Anexo 4` |
+
+Cobertura: 2015-2024 (SICONFI disponivel a partir de 2015). CNT usada como benchmark anual
+desde 2010 para calibrar os metodos de desagregacao.
 
 ---
 
 ## Metodologia
 
-### Paper Original (Santos et al., 2015)
+Baseada em Santos et al. (2015), com as seguintes extensoes:
 
-**Conceito**: Consumo do Governo ≈ Produção Total das Administrações Públicas
-= Remunerações (Salários + Contrib. Efetivas + Contrib. Imputadas) + Consumo Intermediário
-
-**Série selecionada (Série 13 — melhor, MSE=2.778)**:
-- União: Despesas Liquidadas [Salários + Contrib. Efetiva + Contrib. Imputada]
-- Estados (11, cobertura ~70%): Liquidado [Salários + Contrib. Efetiva]
-- Municípios (17, cobertura ~27%): Liquidado [Salários + Contrib. Efetiva]
-- Excluídos: Consumo Intermediário, Restos a Pagar
-
-**Método de desagregação**: Denton (1971) proporcional com benchmark anual das CNT.
-
-### Extensões Modernas
-
-| Aspecto | Paper (2015) | Implementação Moderna |
-|---------|-------------|----------------------|
-| Cobertura estados | 11 (70%) | 27 (100% via SICONFI) |
-| Cobertura municípios | 17 (27%) | >90% via SICONFI |
-| Frequência fiscal | Bimestral (RREO) | Mensal disponível (SICONFI DCA) |
-| Fonte estados | PTs + SISTN | SICONFI (unificado) |
-| Benchmark | CNT Ref.2010 | CNT mais recente |
+- **Cobertura ampliada**: todos os 27 estados via SICONFI (paper usava 11 estados)
+- **Serie temporal estendida**: 2015-2024 (paper cobre ate 2014)
+- **Metodos adicionais**: Chow-Lin, Fernandez e Litterman alem do Denton proporcional
+- **Conversao bimestral->trimestral corrigida**: mapeamento calendario correto
+  (Bim6=Nov-Dez -> 100% Q4)
+- **Gap pre-2018 resolvido**: API SICONFI usa formato de coluna diferente em 2015-2017
+  (`"No Bimestre"` em vez de `"DESPESAS LIQUIDADAS NO BIMESTRE"`); script detecta ambos
 
 ---
 
-## Status
+## Referencias
 
-**Aguardando dados reais.** A infraestrutura de desagregação e validação está pronta.
-Resultados serão publicados após download dos dados reais conforme `DATA_ACQUISITION.md`.
-
-### Verificação contra o paper (Santos et al. 2015, Tabela 2)
-
-Os valores abaixo constam do paper original e são usados como referência para
-verificar a integridade dos dados após download:
-
-| Trimestre | CNT real (R$ bi) | Série 13 estimada (R$ bi) | Desvio |
-|-----------|-----------------|--------------------------|--------|
-| 2011/3    | 199.00          | 188.30                   | -5.38% |
-| 2010/1    | 163.11          | 169.90                   | +4.16% |
-| 2014/4    | 324.89          | 325.00                   | +0.03% |
-
----
-
-## Fontes de Dados
-
-| Variável | Fonte Original | Fonte Moderna | Frequência |
-|----------|---------------|---------------|------------|
-| Sal.+CE União | SIGA Brasil | SICONFI / Portal Transparência | Mensal |
-| CI Imputada União | RREO Anx.4 (SISTN) | SICONFI | Bimestral |
-| Sal.+CE Estados | Portais de Transparência | SICONFI (27 estados) | Bimestral |
-| Sal.+CE Municípios | RREO (SISTN) | SICONFI | Bimestral |
-| Benchmark | CNT IBGE Ref.2010 | CNT IBGE mais recente | Trimestral |
-
-**Nota**: Todos os downloads devem ser realizados fora do container conforme `DATA_ACQUISITION.md`.
-Os arquivos resultantes devem ser colocados em `data/raw/` antes de executar o pipeline.
-
----
-
-## Métodos de Desagregação Testados
-
-| Método | Tipo | Descrição |
-|--------|------|-----------|
-| `denton_prop` | Denton | Minimiza Σ(Δ(q/p))² — **método do paper** |
-| `denton_add` | Denton | Minimiza Σ(Δ(q-p))² |
-| `denton_prop_d2` | Denton | Segunda diferença proporcional |
-| `pro_rata` | Baseline | Distribuição proporcional simples |
-| `chow_lin` | Regressão | GLS com erros AR(1) |
-| `fernandez` | Regressão | GLS com erros I(1) (random walk) |
-| `litterman` | Regressão | GLS com erros ARIMA(1,1,0) |
-
----
-
-## Arquitetura Multi-Agente
-
-O pipeline segue a estrutura de 6 agentes especializados definida na missão:
-
-- **Agente 1** (Replication Engineer): Replicação exata do paper, verificação Tabela 2
-- **Agente 2** (Data Collector): Mapeamento de fontes modernas (SICONFI, Portal Transparência)
-- **Agente 3** (National Accounts Specialist): Mudanças pós-2015 (SISTN→SICONFI, SCN 2010)
-- **Agente 4** (Econometric Validator): RMSE, MAE, MAPE, Theil U, correlação para 70 modelos
-- **Agente 5** (Research Challenger): Evidências contra cada hipótese do paper
-- **Agente 6** (Model Improvement Engineer): Testes de cobertura ampliada + métodos alternativos
-
----
-
-## Referências
-
-- Santos, C.H. et al. (2015). *Uma Metodologia Simplificada de Estimação do Consumo do Governo Nominal em Bases Trimestrais*. Nota Técnica Ipea.
-- Denton, F.T. (1971). *Adjustment of monthly or quarterly series to annual totals*. JASA.
-- Bloem, A.M., Dippelsman, R. & Mæhle, N.Ø. (2001). *Quarterly National Accounts Manual*. IMF.
-- Chow, G.C. & Lin, A.L. (1971). *Best Linear Unbiased Interpolation, Distribution, and Extrapolation*. ReStat.
-- Fernandez, R.B. (1981). *A Methodological Note on the Estimation of Time Series*. ReStat.
-- Litterman, R.B. (1983). *A Random Walk, Markov Model for the Distribution of Time Series*. JBES.
+- **Santos, C.H. et al.** (2015). *Uma Metodologia Simplificada de Estimacao do Consumo do
+  Governo Nominal em Bases Trimestrais*. Carta de Conjuntura no. 27, IPEA/Dimac.
+- Denton, F.T. (1971). Adjustment of monthly or quarterly series to annual totals. *JASA*.
+- Chow, G.C. & Lin, A.L. (1971). Best Linear Unbiased Interpolation, Distribution, and
+  Extrapolation of Time Series by Related Series. *Review of Economics and Statistics*.
+- Fernandez, R.B. (1981). A Methodological Note on the Estimation of Time Series. *ReStat*.
+- Litterman, R.B. (1983). A Random Walk, Markov Model for the Distribution of Time Series.
+  *Journal of Business & Economic Statistics*.
+- Bloem, A.M., Dippelsman, R. & Maehloe, N.O. (2001). *Quarterly National Accounts Manual*. IMF.
