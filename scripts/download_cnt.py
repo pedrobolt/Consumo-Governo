@@ -30,7 +30,7 @@ FTP_URL = ("https://ftp.ibge.gov.br/Contas_Nacionais/"
            "Contas_Nacionais_Trimestrais/Tabelas_Completas/Tab_Compl_CNT.zip")
 OUT_CSV = DATA_RAW / "cnt_quarterly.csv"
 YEAR_START = 2010
-YEAR_END = 2024
+YEAR_END = 2030  # no upper cap — pull all available quarters from the FTP file
 
 QUARTER_MAP = {"I": 1, "II": 2, "III": 3, "IV": 4}
 

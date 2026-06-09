@@ -41,7 +41,7 @@ DATA_RAW.mkdir(parents=True, exist_ok=True)
 
 BASE_URL = "https://apidatalake.tesouro.gov.br/ords/siconfi/tt/rreo"
 YEAR_START = 2015
-YEAR_END = 2024
+YEAR_END = 2025
 BIMESTRES = range(1, 7)
 DELAY = 0.25
 

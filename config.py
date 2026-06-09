@@ -21,7 +21,7 @@ for d in [DATA_RAW, DATA_PROCESSED, DATA_OUTPUT,
 # Horizonte temporal
 # ──────────────────────────────────────────────
 YEAR_START = 2010          # Início da série (paper original)
-YEAR_END = 2024            # Ano mais recente disponível
+YEAR_END = 2025            # Ano mais recente com dados completos (CNT FTP vai até 2026Q1)
 FREQ = 4                   # Trimestral
 
 # ──────────────────────────────────────────────
