@@ -339,7 +339,7 @@ def fit_and_extrapolate(indicator: np.ndarray,
                         annual_totals: np.ndarray,
                         indicator_extrap: np.ndarray,
                         freq: int = 4,
-                        method: str = "chow_lin") -> Tuple[np.ndarray, np.ndarray]:
+                        method: str = "chow_lin") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Fit GLS on benchmark period then extrapolate beyond it.
 
@@ -357,8 +357,9 @@ def fit_and_extrapolate(indicator: np.ndarray,
 
     Returns
     -------
-    fitted  : in-sample fitted values (n,)
-    extrap  : extrapolated values (h,)
+    fitted    : in-sample fitted values (n,)
+    extrap    : extrapolated values (h,)
+    se_extrap : prediction SE for extrapolated quarters (h,), quarterly units
     """
     p = np.asarray(indicator, dtype=float)
     a = np.asarray(annual_totals, dtype=float)
@@ -402,7 +403,23 @@ def fit_and_extrapolate(indicator: np.ndarray,
     X_ext  = np.column_stack([np.ones(len(p_ext)), p_ext])
     extrap = X_ext @ beta
 
-    return fitted, extrap
+    # Prediction SE (quarterly units):
+    #   Use raw (unweighted) residual variance and OLS leverage to avoid
+    #   numerical blow-up from nearly-singular Litterman V_a.
+    #   se_q = (sigma_raw / freq) * sqrt(1 + x_a' (X_a'X_a)^{-1} x_a)
+    #   where x_a = [freq, freq*x_q] is the annual-scale covariate.
+    sigma2_raw = max(float(u_a @ u_a) / max(m - k, 1), 1e-12)
+    try:
+        XtX_inv = inv(X_a.T @ X_a + eps * np.eye(k))
+    except np.linalg.LinAlgError:
+        XtX_inv = np.linalg.pinv(X_a.T @ X_a)
+    X_ext_annual = np.column_stack([np.full(len(p_ext), float(freq)), p_ext * freq])
+    se_extrap = np.array([
+        np.sqrt(max(sigma2_raw * (1.0 + x @ XtX_inv @ x), 0.0)) / freq
+        for x in X_ext_annual
+    ])
+
+    return fitted, extrap, se_extrap
 
 
 # ──────────────────────────────────────────────────────────────────────────────

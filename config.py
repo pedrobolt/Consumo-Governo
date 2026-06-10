@@ -25,6 +25,14 @@ YEAR_END = 2025            # Ano mais recente com dados completos (CNT FTP vai a
 FREQ = 4                   # Trimestral
 
 # ──────────────────────────────────────────────
+# Spec fixa — alterada apenas com pipeline.py --full
+# ──────────────────────────────────────────────
+BEST_SPEC          = "spec_estados_sal_ce"
+OOS_WEIGHTS_FILE   = OUTPUT_TABLES / "oos_weights.json"
+VINTAGE_FILE       = OUTPUT_TABLES / "vintage_history.csv"
+UPDATE_REPORT_FILE = ROOT / "output" / "UPDATE_REPORT.md"
+
+# ──────────────────────────────────────────────
 # APIs
 # ──────────────────────────────────────────────
 IBGE_API_BASE = "https://servicodados.ibge.gov.br/api/v3"

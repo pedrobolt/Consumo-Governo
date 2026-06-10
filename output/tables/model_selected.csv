@@ -43,5 +43,5 @@ quarter,method,spec,estimate_R_bi,cnt_R_bi,desvio_pct,lower_90,upper_90,is_provi
 2025Q2,denton_cholette,spec_estados_sal_ce,572.655,598.3491,-4.2942,,,False,"annual CNT benchmark available — Denton-Cholette (parsimonious, no rho)"
 2025Q3,denton_cholette,spec_estados_sal_ce,597.1875,607.065,-1.6271,,,False,"annual CNT benchmark available — Denton-Cholette (parsimonious, no rho)"
 2025Q4,denton_cholette,spec_estados_sal_ce,731.2382,710.8115,2.8737,,,False,"annual CNT benchmark available — Denton-Cholette (parsimonious, no rho)"
-2026Q1,"ensemble(chow_lin,litterman)",spec_estados_sal_ce,576.0368,598.9941,-3.8326,554.0883,597.9854,True,no annual CNT benchmark — ensemble CL+LT extrapolation; indicator: Bim1+Bim2 fully observed
-2026Q2,"ensemble(chow_lin,litterman)",spec_estados_sal_ce,604.7121,,,582.7635,626.6607,True,no annual CNT benchmark — ensemble CL+LT extrapolation; indicator: Bim2 only (Bim3 not yet published; scaled by historical ratio)
+2026Q1,"ensemble(chow_lin,litterman)",spec_estados_sal_ce,576.3943,598.9941,-3.773,554.3025,598.486,True,no annual CNT benchmark — ensemble CL+LT extrapolation; indicator: Bim1+Bim2 fully observed
+2026Q2,"ensemble(chow_lin,litterman)",spec_estados_sal_ce,605.1322,,,582.155,628.1094,True,no annual CNT benchmark — ensemble CL+LT extrapolation; indicator: Bim2 only (Bim3 not yet published; scaled by historical ratio)
