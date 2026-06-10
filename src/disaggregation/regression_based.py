@@ -332,6 +332,80 @@ def ols_simple(indicator: np.ndarray,
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# Extrapolação além do último benchmark
+# ──────────────────────────────────────────────────────────────────────────────
+
+def fit_and_extrapolate(indicator: np.ndarray,
+                        annual_totals: np.ndarray,
+                        indicator_extrap: np.ndarray,
+                        freq: int = 4,
+                        method: str = "chow_lin") -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Fit GLS on benchmark period then extrapolate beyond it.
+
+    Annual-constraint residual correction is applied only within the benchmark
+    period; extrapolated values are pure regression predictions:
+        ŷ_{T+h} = [1, x_{T+h}] @ beta_hat
+
+    Parameters
+    ----------
+    indicator       : quarterly indicator for benchmark period (n = m*freq,)
+    annual_totals   : annual CNT benchmarks (m,)
+    indicator_extrap: indicator for quarters to extrapolate (h,)
+    freq            : 4 for quarterly
+    method          : 'chow_lin' or 'litterman'
+
+    Returns
+    -------
+    fitted  : in-sample fitted values (n,)
+    extrap  : extrapolated values (h,)
+    """
+    p = np.asarray(indicator, dtype=float)
+    a = np.asarray(annual_totals, dtype=float)
+    n, m = len(p), len(a)
+    if n != m * freq:
+        raise ValueError(f"indicator length {n} != m*freq={m*freq}")
+    if method not in ("chow_lin", "litterman"):
+        raise ValueError(f"method must be 'chow_lin' or 'litterman', got '{method}'")
+
+    C   = _aggregation_matrix(n, freq)
+    X_q = np.column_stack([np.ones(n), p])
+    X_a = C @ X_q
+
+    if method == "chow_lin":
+        rho = _mle_rho(X_q, a, C, freq)
+        V_q = _ar1_cov_matrix(n, rho)
+    else:
+        V_q = _ar1_rw_cov_matrix(n, rho=0.5)
+
+    eps     = 1e-8
+    V_a     = C @ V_q @ C.T
+    V_a_reg = V_a + eps * np.trace(V_a) / m * np.eye(m)
+    try:
+        V_inv = inv(V_a_reg)
+    except np.linalg.LinAlgError:
+        V_inv = np.linalg.pinv(V_a_reg)
+
+    k     = X_q.shape[1]
+    M     = X_a.T @ V_inv @ X_a
+    M_reg = M + eps * np.trace(M) / k * np.eye(k)
+    try:
+        beta = solve(M_reg, X_a.T @ V_inv @ a)
+    except np.linalg.LinAlgError:
+        beta = np.linalg.lstsq(X_a, a, rcond=None)[0]
+
+    u_a    = a - X_a @ beta
+    u_q    = V_q @ C.T @ V_inv @ u_a
+    fitted = X_q @ beta + u_q
+
+    p_ext  = np.asarray(indicator_extrap, dtype=float)
+    X_ext  = np.column_stack([np.ones(len(p_ext)), p_ext])
+    extrap = X_ext @ beta
+
+    return fitted, extrap
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # Interface unificada
 # ──────────────────────────────────────────────────────────────────────────────
 

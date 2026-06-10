@@ -148,12 +148,33 @@ desde 2010 para calibrar os metodos de desagregacao.
 Baseada em Santos et al. (2015), com as seguintes extensoes:
 
 - **Cobertura ampliada**: todos os 27 estados via SICONFI (paper usava 11 estados)
-- **Serie temporal estendida**: 2015-2024 (paper cobre ate 2014)
+- **Serie temporal estendida**: 2015-2025 (paper cobre ate 2014)
 - **Metodos adicionais**: Chow-Lin, Fernandez e Litterman alem do Denton proporcional
 - **Conversao bimestral->trimestral corrigida**: mapeamento calendario correto
   (Bim6=Nov-Dez -> 100% Q4)
 - **Gap pre-2018 resolvido**: API SICONFI usa formato de coluna diferente em 2015-2017
   (`"No Bimestre"` em vez de `"DESPESAS LIQUIDADAS NO BIMESTRE"`); script detecta ambos
+
+### Arquitetura hibrida: Denton (in-sample) + ensemble (nowcast)
+
+O pipeline usa metodos distintos dependendo da disponibilidade do benchmark anual:
+
+| Periodo | Metodo | Justificativa |
+|---------|--------|---------------|
+| 2015Q1-2025Q4 (benchmark disponivel) | **Denton-Cholette proporcional** | Parcimonioso (sem rho), MAPE 2.57% vs 2.65% do Chow-Lin; mais proximo da metodologia IPEA |
+| 2026Q1+ (sem benchmark anual) | **Ensemble Chow-Lin + Litterman** | Extrapolam alem do ultimo benchmark; IC 90% = estimativa +/- 1.645 x RMSE |
+
+**Por que nao usar Chow-Lin in-sample?** Dummies de quebra estrutural mostraram que o
+parametro rho absorve as quebras (sobe de 0.84 para 0.99 com dummies COVID+fiscal+transicao)
+sem reduzir o MAPE. Denton evita esse grau de liberdade espurio.
+
+**Trimestres-problema (|desvio| > 5%):** os maiores erros ocorrem em 2020Q2 (-7.6%,
+COVID), 2020Q4 (+7.2%, rebound), e 2016Q3-Q4 (ajuste fiscal). A causa e a divergencia
+entre competencia (CNT/IBGE, regime de accrual) e caixa (SICONFI, liquidado) em periodos
+de choque fiscal. Denton e Chow-Lin erram quasi-identicamente nestes trimestres
+(ex: 2020Q2 Chow-Lin -7.60%, Denton -7.13%), confirmando que o problema esta no
+indicador, nao no metodo. Sao uma limitacao estrutural conhecida, nao uma falha de
+metodologia.
 
 ---
 
