@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from config import (
     YEAR_START, YEAR_END, FREQ,
     OUTPUT_TABLES, OUTPUT_SERIES,
-    BEST_SPEC, OOS_WEIGHTS_FILE, VINTAGE_FILE, UPDATE_REPORT_FILE,
+    BEST_SPEC, BEST_METHOD, OOS_WEIGHTS_FILE, VINTAGE_FILE, UPDATE_REPORT_FILE,
 )
 from src.disaggregation.denton import (
     denton_proportional, denton_additive, denton_second_diff_proportional, pro_rata
@@ -202,14 +202,29 @@ def validate_all(estimates: Dict[str, pd.Series],
     return metrics_df
 
 
-def select_best_denton_spec(metrics_df: pd.DataFrame):
-    """Return (spec_name, mape, rmse) for the Denton-proportional model with lowest MAPE."""
-    denton = metrics_df[metrics_df["model"].str.endswith("_denton_prop")].copy()
-    if denton.empty:
-        raise RuntimeError("No denton_prop models in metrics_df")
-    best = denton.sort_values("MAPE").iloc[0]
-    spec = best["model"].replace("_denton_prop", "")
-    return spec, float(best["MAPE"]), float(best["RMSE"])
+def select_best_benchmark_spec(metrics_df: pd.DataFrame):
+    """
+    Return (spec_name, method_key, mape, rmse) for the best benchmark model.
+
+    Considers pro_rata and denton_proportional — both are parameter-free
+    indicator-driven methods valid as in-sample benchmarks.  Pro_rata wins
+    on spec_estados_sal_ce (MAPE 2.40% vs denton_prop 2.57%).
+    """
+    SUFFIXES = ("_pro_rata", "_denton_prop")
+    bench = metrics_df[
+        metrics_df["model"].str.endswith(SUFFIXES[0])
+        | metrics_df["model"].str.endswith(SUFFIXES[1])
+    ].copy()
+    if bench.empty:
+        raise RuntimeError("No pro_rata or denton_prop models in metrics_df")
+    best = bench.sort_values("MAPE").iloc[0]
+    model_name = best["model"]
+    for suffix in SUFFIXES:
+        if model_name.endswith(suffix):
+            method_key = suffix.lstrip("_")
+            spec = model_name[: -len(suffix)]
+            break
+    return spec, method_key, float(best["MAPE"]), float(best["RMSE"])
 
 
 def load_oos_weights(best_spec: str,
@@ -278,10 +293,11 @@ def build_model_selected(
         cnt_annual: pd.Series,
         cnt_quarterly: pd.Series,
         cl_rmse: float,
-        oos_weights: Dict[str, float] | None = None) -> None:
+        oos_weights: Dict[str, float] | None = None,
+        best_method_key: str = "pro_rata") -> None:
     """
     Produce output/tables/model_selected.csv with hybrid method assignment:
-      - Benchmark quarters (annual CNT available): Denton-Cholette (proportional)
+      - Benchmark quarters (annual CNT available): best_method_key (pro_rata or denton_prop)
       - Nowcast quarters (no annual benchmark yet): ensemble Chow-Lin + Litterman
 
     Columns: quarter, method, spec, estimate_R_bi, cnt_R_bi, desvio_pct,
@@ -292,23 +308,23 @@ def build_model_selected(
     w_cl = oos_weights.get("chow_lin", 0.5)
     w_lt = oos_weights.get("litterman", 0.5)
 
-    denton_key = f"{best_spec}_denton_prop"
-    if denton_key not in estimates:
-        logger.warning("Denton key %s not found in estimates.", denton_key)
+    bench_key = f"{best_spec}_{best_method_key}"
+    if bench_key not in estimates:
+        logger.warning("Benchmark key %s not found in estimates.", bench_key)
         return
 
-    denton_series = estimates[denton_key]
-    train_yrs     = sorted(cnt_annual.index.tolist())
+    bench_series = estimates[bench_key]
+    train_yrs    = sorted(cnt_annual.index.tolist())
 
-    # ── In-sample rows (Denton-Cholette) ─────────────────────────────────────
+    # ── In-sample rows ────────────────────────────────────────────────────────
     rows = []
-    for dt, est_val in denton_series.items():
+    for dt, est_val in bench_series.items():
         act = cnt_quarterly.get(dt)
         dev_pct = ((float(est_val) - float(act)) / float(act) * 100
                    if act is not None and not pd.isna(act) else None)
         rows.append(dict(
             quarter=f"{dt.year}Q{dt.quarter}",
-            method="denton_cholette",
+            method=best_method_key,
             spec=best_spec,
             estimate_R_bi=round(float(est_val), 4),
             cnt_R_bi=round(float(act), 4) if act is not None and not pd.isna(act) else None,
@@ -316,7 +332,7 @@ def build_model_selected(
             lower_90=None,
             upper_90=None,
             is_provisional=False,
-            selection_reason="annual CNT benchmark available — Denton-Cholette (parsimonious, no rho)",
+            selection_reason=f"annual CNT benchmark available — {best_method_key} (parameter-free, in-sample winner)",
         ))
 
     # ── Nowcast rows (ensemble Chow-Lin + Litterman) ──────────────────────────
@@ -386,10 +402,11 @@ def build_model_selected(
           .reset_index(drop=True))
     OUTPUT_TABLES.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUTPUT_TABLES / "model_selected.csv", index=False)
-    logger.info("Saved model_selected.csv: %d rows (%d benchmark, %d nowcast)",
+    logger.info("Saved model_selected.csv: %d rows (%d benchmark [%s], %d nowcast)",
                 len(df),
-                df["method"].eq("denton_cholette").sum(),
-                df["method"].ne("denton_cholette").sum())
+                df["method"].eq(best_method_key).sum(),
+                best_method_key,
+                df["method"].ne(best_method_key).sum())
 
 
 def run_pipeline(cnt_csv: str = "data/raw/cnt_quarterly.csv",
@@ -418,13 +435,14 @@ def run_pipeline(cnt_csv: str = "data/raw/cnt_quarterly.csv",
                     best.get("MAPE", 0), best.get("Corr", 0))
 
         # ── Hybrid model selection ─────────────────────────────────────────
-        best_spec, denton_mape, denton_rmse = select_best_denton_spec(metrics_df)
-        logger.info("Best Denton spec: %s | MAPE=%.4f%% | RMSE=%.4f",
-                    best_spec, denton_mape, denton_rmse)
+        best_spec, best_method_key, bench_mape, bench_rmse = select_best_benchmark_spec(metrics_df)
+        logger.info("Best benchmark spec: %s | method: %s | MAPE=%.4f%% | RMSE=%.4f",
+                    best_spec, best_method_key, bench_mape, bench_rmse)
         oos_weights = load_oos_weights(best_spec)
         build_model_selected(best_spec, estimates, indicator_dict,
-                             cnt_annual, cnt_quarterly, denton_rmse,
-                             oos_weights=oos_weights)
+                             cnt_annual, cnt_quarterly, bench_rmse,
+                             oos_weights=oos_weights,
+                             best_method_key=best_method_key)
 
         best_series = estimates.get(best["model"])
         if best_series is not None:
@@ -570,27 +588,23 @@ def run_nowcast_only(cnt_csv: str = "data/raw/cnt_quarterly.csv",
     cnt_quarterly, cnt_annual = load_cnt_real(cnt_csv)
     indicator_dict = load_fiscal_indicators(fiscal_csv)
 
-    best_spec = BEST_SPEC
-    if not OOS_WEIGHTS_FILE.exists():
-        estimates = disaggregate_all(indicator_dict, cnt_annual)
-        metrics_df = validate_all(estimates, cnt_quarterly)
-        oos_weights = load_oos_weights(best_spec)
-    else:
-        estimates = disaggregate_all(indicator_dict, cnt_annual)
-        oos_weights = load_oos_weights(best_spec)
+    best_spec      = BEST_SPEC
+    best_method_key = BEST_METHOD
+    estimates = disaggregate_all(indicator_dict, cnt_annual)
+    oos_weights = load_oos_weights(best_spec)
 
-    denton_mape = 0.0
-    denton_rmse = 1.0
+    bench_rmse = 1.0
     metrics_path = OUTPUT_TABLES / "metricas_completas.csv"
     if metrics_path.exists():
-        m = pd.read_csv(metrics_path)
-        row = m[m["model"] == f"{best_spec}_denton_prop"]
+        m   = pd.read_csv(metrics_path)
+        row = m[m["model"] == f"{best_spec}_{best_method_key}"]
         if not row.empty:
-            denton_rmse = float(row.iloc[0]["RMSE"])
+            bench_rmse = float(row.iloc[0]["RMSE"])
 
     build_model_selected(best_spec, estimates, indicator_dict,
-                         cnt_annual, cnt_quarterly, denton_rmse,
-                         oos_weights=oos_weights)
+                         cnt_annual, cnt_quarterly, bench_rmse,
+                         oos_weights=oos_weights,
+                         best_method_key=best_method_key)
 
     ms = pd.read_csv(OUTPUT_TABLES / "model_selected.csv")
     append_vintage(ms, cnt_quarterly)

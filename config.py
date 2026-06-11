@@ -28,6 +28,7 @@ FREQ = 4                   # Trimestral
 # Spec fixa — alterada apenas com pipeline.py --full
 # ──────────────────────────────────────────────
 BEST_SPEC          = "spec_estados_sal_ce"
+BEST_METHOD        = "pro_rata"          # benchmark method for in-sample rows; updated by --full
 OOS_WEIGHTS_FILE   = OUTPUT_TABLES / "oos_weights.json"
 VINTAGE_FILE       = OUTPUT_TABLES / "vintage_history.csv"
 UPDATE_REPORT_FILE = ROOT / "output" / "UPDATE_REPORT.md"
