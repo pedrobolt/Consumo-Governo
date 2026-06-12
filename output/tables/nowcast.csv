@@ -1,0 +1,3 @@
+quarter,method,spec,estimate_R_bi,cnt_R_bi,desvio_pct,is_provisional,selection_reason
+2026Q1,chow_lin,spec_estados_sal_ce,592.4724,598.9941,-1.0888,True,nowcast — Chow-Lin extrapolation; full indicator available
+2026Q2,chow_lin,spec_estados_sal_ce,624.0308,,,True,"nowcast — Chow-Lin extrapolation; partial Q2 (Bim2 only, scaled by historical ratio)"

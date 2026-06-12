@@ -1,47 +1,47 @@
-quarter,method,spec,estimate_R_bi,cnt_R_bi,desvio_pct,lower_90,upper_90,is_provisional,selection_reason
-2015Q1,pro_rata,spec_estados_sal_ce,265.3143,266.3158,-0.3761,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2015Q2,pro_rata,spec_estados_sal_ce,287.4144,290.1793,-0.9528,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2015Q3,pro_rata,spec_estados_sal_ce,286.8293,287.9218,-0.3794,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2015Q4,pro_rata,spec_estados_sal_ce,346.2179,341.359,1.4234,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2016Q1,pro_rata,spec_estados_sal_ce,290.5698,284.7479,2.0446,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2016Q2,pro_rata,spec_estados_sal_ce,310.1096,312.1029,-0.6387,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2016Q3,pro_rata,spec_estados_sal_ce,306.9804,303.2635,1.2256,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2016Q4,pro_rata,spec_estados_sal_ce,369.9852,377.5307,-1.9986,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2017Q1,pro_rata,spec_estados_sal_ce,307.8648,302.8184,1.6665,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2017Q2,pro_rata,spec_estados_sal_ce,316.0776,333.5587,-5.2408,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2017Q3,pro_rata,spec_estados_sal_ce,310.9396,314.3608,-1.0883,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2017Q4,pro_rata,spec_estados_sal_ce,392.876,377.0201,4.2056,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2018Q1,pro_rata,spec_estados_sal_ce,315.9124,315.1743,0.2342,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2018Q2,pro_rata,spec_estados_sal_ce,334.8636,342.5688,-2.2492,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2018Q3,pro_rata,spec_estados_sal_ce,336.0141,338.3385,-0.687,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2018Q4,pro_rata,spec_estados_sal_ce,406.6898,397.3983,2.3381,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2019Q1,pro_rata,spec_estados_sal_ce,330.6264,332.8538,-0.6692,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2019Q2,pro_rata,spec_estados_sal_ce,352.1799,367.4531,-4.1565,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2019Q3,pro_rata,spec_estados_sal_ce,358.2909,357.1836,0.31,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2019Q4,pro_rata,spec_estados_sal_ce,435.5158,419.1225,3.9113,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2020Q1,pro_rata,spec_estados_sal_ce,351.6336,344.7918,1.9843,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2020Q2,pro_rata,spec_estados_sal_ce,357.0624,381.9806,-6.5234,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2020Q3,pro_rata,spec_estados_sal_ce,362.6726,366.836,-1.135,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2020Q4,pro_rata,spec_estados_sal_ce,460.8353,438.5955,5.0707,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2021Q1,pro_rata,spec_estados_sal_ce,367.3311,359.9215,2.0587,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2021Q2,pro_rata,spec_estados_sal_ce,394.998,411.4677,-4.0027,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2021Q3,pro_rata,spec_estados_sal_ce,395.9437,408.387,-3.0469,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2021Q4,pro_rata,spec_estados_sal_ce,513.2621,491.7587,4.3728,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2022Q1,pro_rata,spec_estados_sal_ce,394.1416,385.3427,2.2834,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2022Q2,pro_rata,spec_estados_sal_ce,447.7733,456.7867,-1.9732,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2022Q3,pro_rata,spec_estados_sal_ce,452.224,462.2302,-2.1648,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2022Q4,pro_rata,spec_estados_sal_ce,560.7447,550.524,1.8565,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2023Q1,pro_rata,spec_estados_sal_ce,456.1719,435.0385,4.8578,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2023Q2,pro_rata,spec_estados_sal_ce,492.9745,511.5292,-3.6273,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2023Q3,pro_rata,spec_estados_sal_ce,509.3382,506.8464,0.4916,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2023Q4,pro_rata,spec_estados_sal_ce,625.414,630.4845,-0.8042,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2024Q1,pro_rata,spec_estados_sal_ce,486.0754,475.4443,2.236,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2024Q2,pro_rata,spec_estados_sal_ce,533.265,551.0367,-3.2251,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2024Q3,pro_rata,spec_estados_sal_ce,533.1975,546.4603,-2.427,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2024Q4,pro_rata,spec_estados_sal_ce,658.3805,637.9771,3.1981,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2025Q1,pro_rata,spec_estados_sal_ce,543.2749,521.1889,4.2376,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2025Q2,pro_rata,spec_estados_sal_ce,574.3397,598.3491,-4.0126,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2025Q3,pro_rata,spec_estados_sal_ce,593.8131,607.065,-2.1829,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2025Q4,pro_rata,spec_estados_sal_ce,725.9867,710.8115,2.1349,,,False,"annual CNT benchmark available — pro_rata (parameter-free, in-sample winner)"
-2026Q1,"ensemble(chow_lin,litterman)",spec_estados_sal_ce,576.3943,598.9941,-3.773,554.3025,598.486,True,no annual CNT benchmark — ensemble CL+LT extrapolation; indicator: Bim1+Bim2 fully observed
-2026Q2,"ensemble(chow_lin,litterman)",spec_estados_sal_ce,605.1322,,,582.155,628.1094,True,no annual CNT benchmark — ensemble CL+LT extrapolation; indicator: Bim2 only (Bim3 not yet published; scaled by historical ratio)
+quarter,method,spec,estimate_R_bi,cnt_R_bi,desvio_pct,is_provisional,selection_reason
+2015Q1,denton_proportional,spec_estados_sal_ce,264.0477,266.3158,-0.8517,False,annual CNT benchmark — Denton proportional (paper method)
+2015Q2,denton_proportional,spec_estados_sal_ce,286.3646,290.1793,-1.3146,False,annual CNT benchmark — Denton proportional (paper method)
+2015Q3,denton_proportional,spec_estados_sal_ce,286.4517,287.9218,-0.5106,False,annual CNT benchmark — Denton proportional (paper method)
+2015Q4,denton_proportional,spec_estados_sal_ce,348.9119,341.359,2.2126,False,annual CNT benchmark — Denton proportional (paper method)
+2016Q1,denton_proportional,spec_estados_sal_ce,289.4741,284.7479,1.6598,False,annual CNT benchmark — Denton proportional (paper method)
+2016Q2,denton_proportional,spec_estados_sal_ce,311.2563,312.1029,-0.2712,False,annual CNT benchmark — Denton proportional (paper method)
+2016Q3,denton_proportional,spec_estados_sal_ce,309.4705,303.2635,2.0467,False,annual CNT benchmark — Denton proportional (paper method)
+2016Q4,denton_proportional,spec_estados_sal_ce,367.4441,377.5307,-2.6717,False,annual CNT benchmark — Denton proportional (paper method)
+2017Q1,denton_proportional,spec_estados_sal_ce,313.7459,302.8184,3.6086,False,annual CNT benchmark — Denton proportional (paper method)
+2017Q2,denton_proportional,spec_estados_sal_ce,316.9077,333.5587,-4.9919,False,annual CNT benchmark — Denton proportional (paper method)
+2017Q3,denton_proportional,spec_estados_sal_ce,307.591,314.3608,-2.1535,False,annual CNT benchmark — Denton proportional (paper method)
+2017Q4,denton_proportional,spec_estados_sal_ce,389.5133,377.0201,3.3137,False,annual CNT benchmark — Denton proportional (paper method)
+2018Q1,denton_proportional,spec_estados_sal_ce,313.693,315.1743,-0.47,False,annual CNT benchmark — Denton proportional (paper method)
+2018Q2,denton_proportional,spec_estados_sal_ce,334.172,342.5688,-2.4511,False,annual CNT benchmark — Denton proportional (paper method)
+2018Q3,denton_proportional,spec_estados_sal_ce,336.612,338.3385,-0.5103,False,annual CNT benchmark — Denton proportional (paper method)
+2018Q4,denton_proportional,spec_estados_sal_ce,409.0029,397.3983,2.9201,False,annual CNT benchmark — Denton proportional (paper method)
+2019Q1,denton_proportional,spec_estados_sal_ce,330.2975,332.8538,-0.768,False,annual CNT benchmark — Denton proportional (paper method)
+2019Q2,denton_proportional,spec_estados_sal_ce,352.4015,367.4531,-4.0962,False,annual CNT benchmark — Denton proportional (paper method)
+2019Q3,denton_proportional,spec_estados_sal_ce,358.7522,357.1836,0.4392,False,annual CNT benchmark — Denton proportional (paper method)
+2019Q4,denton_proportional,spec_estados_sal_ce,435.1618,419.1225,3.8269,False,annual CNT benchmark — Denton proportional (paper method)
+2020Q1,denton_proportional,spec_estados_sal_ce,349.4715,344.7918,1.3572,False,annual CNT benchmark — Denton proportional (paper method)
+2020Q2,denton_proportional,spec_estados_sal_ce,354.73,381.9806,-7.134,False,annual CNT benchmark — Denton proportional (paper method)
+2020Q3,denton_proportional,spec_estados_sal_ce,361.2343,366.836,-1.527,False,annual CNT benchmark — Denton proportional (paper method)
+2020Q4,denton_proportional,spec_estados_sal_ce,466.7681,438.5955,6.4234,False,annual CNT benchmark — Denton proportional (paper method)
+2021Q1,denton_proportional,spec_estados_sal_ce,362.5462,359.9215,0.7292,False,annual CNT benchmark — Denton proportional (paper method)
+2021Q2,denton_proportional,spec_estados_sal_ce,395.9308,411.4677,-3.776,False,annual CNT benchmark — Denton proportional (paper method)
+2021Q3,denton_proportional,spec_estados_sal_ce,401.1287,408.387,-1.7773,False,annual CNT benchmark — Denton proportional (paper method)
+2021Q4,denton_proportional,spec_estados_sal_ce,511.9292,491.7587,4.1017,False,annual CNT benchmark — Denton proportional (paper method)
+2022Q1,denton_proportional,spec_estados_sal_ce,401.4098,385.3427,4.1695,False,annual CNT benchmark — Denton proportional (paper method)
+2022Q2,denton_proportional,spec_estados_sal_ce,447.9286,456.7867,-1.9392,False,annual CNT benchmark — Denton proportional (paper method)
+2022Q3,denton_proportional,spec_estados_sal_ce,446.5617,462.2302,-3.3898,False,annual CNT benchmark — Denton proportional (paper method)
+2022Q4,denton_proportional,spec_estados_sal_ce,558.9835,550.524,1.5366,False,annual CNT benchmark — Denton proportional (paper method)
+2023Q1,denton_proportional,spec_estados_sal_ce,451.1596,435.0385,3.7057,False,annual CNT benchmark — Denton proportional (paper method)
+2023Q2,denton_proportional,spec_estados_sal_ce,493.3652,511.5292,-3.5509,False,annual CNT benchmark — Denton proportional (paper method)
+2023Q3,denton_proportional,spec_estados_sal_ce,513.667,506.8464,1.3457,False,annual CNT benchmark — Denton proportional (paper method)
+2023Q4,denton_proportional,spec_estados_sal_ce,625.7068,630.4845,-0.7578,False,annual CNT benchmark — Denton proportional (paper method)
+2024Q1,denton_proportional,spec_estados_sal_ce,491.0034,475.4443,3.2725,False,annual CNT benchmark — Denton proportional (paper method)
+2024Q2,denton_proportional,spec_estados_sal_ce,532.9988,551.0367,-3.2734,False,annual CNT benchmark — Denton proportional (paper method)
+2024Q3,denton_proportional,spec_estados_sal_ce,528.9373,546.4603,-3.2066,False,annual CNT benchmark — Denton proportional (paper method)
+2024Q4,denton_proportional,spec_estados_sal_ce,657.9789,637.9771,3.1352,False,annual CNT benchmark — Denton proportional (paper method)
+2025Q1,denton_proportional,spec_estados_sal_ce,536.3339,521.1889,2.9059,False,annual CNT benchmark — Denton proportional (paper method)
+2025Q2,denton_proportional,spec_estados_sal_ce,572.655,598.3491,-4.2942,False,annual CNT benchmark — Denton proportional (paper method)
+2025Q3,denton_proportional,spec_estados_sal_ce,597.1875,607.065,-1.6271,False,annual CNT benchmark — Denton proportional (paper method)
+2025Q4,denton_proportional,spec_estados_sal_ce,731.2382,710.8115,2.8737,False,annual CNT benchmark — Denton proportional (paper method)
+2026Q1,chow_lin,spec_estados_sal_ce,592.4724,598.9941,-1.0888,True,nowcast — Chow-Lin extrapolation; full indicator available
+2026Q2,chow_lin,spec_estados_sal_ce,624.0308,,,True,"nowcast — Chow-Lin extrapolation; partial Q2 (Bim2 only, scaled by historical ratio)"

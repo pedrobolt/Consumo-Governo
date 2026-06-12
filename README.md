@@ -61,6 +61,17 @@ python pipeline.py --full
 - **Sem intervalos de incerteza**: removidos por calibração problemática. A incerteza é
   avaliada pelas revisões históricas em `vintage_history.csv`.
 
+## Conversão bimestral → trimestral (Santos et al. 2015)
+
+| Bimestre | Meses | Alocação |
+|----------|-------|----------|
+| Bim 1 (jan-fev) | Jan, Fev | 100% → Q1 |
+| Bim 2 (mar-abr) | Mar, Abr | 50% → Q1 + 50% → Q2 |
+| Bim 3 (mai-jun) | Mai, Jun | 100% → Q2 |
+| Bim 4 (jul-ago) | Jul, Ago | 100% → Q3 |
+| Bim 5 (set-out) | Set, Out | 50% → Q3 + 50% → Q4 |
+| Bim 6 (nov-dez) | Nov, Dez | 100% → Q4 |
+
 ## Referência
 
 Santos, R. A. et al. (2015). *Uma Metodologia Simplificada de Estimação do Consumo do
