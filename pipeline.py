@@ -453,7 +453,7 @@ def generate_update_report(model_selected_df: pd.DataFrame,
         real_df = real_df[real_df["var_real_yoy_pct"].notna()]
         if not real_df.empty:
             latest_real = real_df.sort_values("quarter").iloc[-1]
-            proxy_note  = " (INPC proxy — deflator not yet published)" if latest_real["deflator_is_proxy"] else ""
+            proxy_note  = " (IPCA proxy — CNT deflator not yet published)" if latest_real["deflator_is_proxy"] else ""
             lines += [
                 "## Real Growth",
                 "",

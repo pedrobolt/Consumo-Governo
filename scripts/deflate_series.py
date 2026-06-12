@@ -19,6 +19,11 @@ Writes:
     output/tables/serie_real.csv
     Columns: quarter, nominal_R_bi, deflator, real_R_bi_base2010,
              var_real_yoy_pct, deflator_is_proxy
+
+Note on interpretation:
+    real_R_bi_base2010 deflates the MODEL ESTIMATE, not the official IBGE series.
+    The divergence from IBGE's published real growth equals the model's nominal
+    estimation error (MAPE ~2.5% in-sample).
 """
 
 import csv
@@ -146,7 +151,7 @@ def download_deflator(force: bool = False) -> pd.Series:
             if v and v > 0:
                 deflator[period] = n / v
     else:
-        logger.warning("No volume/index sheet found in zip — INPC proxy will be used.")
+        logger.warning("No volume/index sheet found in zip — IPCA proxy will be used.")
 
     # Normalise: base year average = 100
     if deflator:
@@ -170,15 +175,21 @@ def download_deflator(force: bool = False) -> pd.Series:
     return s
 
 
-# ── INPC proxy for nowcast quarters ──────────────────────────────────────────
+# ── IPCA proxy for nowcast quarters ──────────────────────────────────────────
 
-def fetch_inpc_quarterly(year_start: int = 2010, year_end: int = 2030) -> pd.Series:
+def fetch_ipca_quarterly(year_start: int = 2010, year_end: int = 2030) -> pd.Series:
     """
     Fetch monthly IPCA variation (%) from SIDRA table 1737 var 63 in annual batches
     and aggregate to a quarterly price index with base year average = 100.
 
-    IPCA is used as the proxy deflator for nowcast quarters (no published CNT deflator).
-    It is a closer proxy to the government consumption deflator than INPC.
+    Partial-quarter handling: if only 1–2 months of a quarter have been published,
+    the missing months are filled by carrying the last known monthly rate forward
+    (geometric mean of all filled months). These entries are included in the returned
+    Series; the caller marks them deflator_is_proxy=True.
+
+    IPCA is used as the proxy deflator for nowcast quarters without a published CNT
+    deflator. Carry-forward only activates within a quarter that has at least one
+    published month — entirely future quarters produce no entry.
     """
     raw_serie: dict[str, str] = {}
     for year in range(year_start, year_end + 1):
@@ -198,36 +209,69 @@ def fetch_inpc_quarterly(year_start: int = 2010, year_end: int = 2030) -> pd.Ser
         logger.warning("IPCA fetch returned no data — proxy deflator unavailable.")
         return pd.Series(dtype=float)
 
-    # Chain-link monthly % changes into a price level starting at 100
-    monthly_index: dict[tuple[int, int], float] = {}
+    # Step 1: chain-link monthly % changes into a price level
+    monthly_level_raw: dict[tuple[int, int], float] = {}
+    monthly_pct: dict[tuple[int, int], float] = {}
     level = 100.0
     for period_code in sorted(raw_serie.keys()):
         val = raw_serie[period_code]
         if val in ("-", "...", None, ""):
             continue
         y, m = int(period_code[:4]), int(period_code[4:])
-        level *= (1 + float(val) / 100)
-        monthly_index[(y, m)] = level
+        pct = float(val)
+        level *= (1 + pct / 100)
+        monthly_level_raw[(y, m)] = level
+        monthly_pct[(y, m)] = pct
 
-    # Normalise to base year
-    base_vals = [v for (y, _), v in monthly_index.items() if y == BASE_YEAR]
-    if base_vals:
-        base_avg = sum(base_vals) / len(base_vals)
-        monthly_index = {k: v / base_avg * 100 for k, v in monthly_index.items()}
+    # Step 2: normalise so base year average = 100
+    base_vals = [v for (y, _), v in monthly_level_raw.items() if y == BASE_YEAR]
+    norm = (sum(base_vals) / len(base_vals)) if base_vals else 100.0
+    monthly_level = {k: v / norm * 100 for k, v in monthly_level_raw.items()}
 
-    # Geometric mean of the 3 months in each quarter → quarterly index
+    # Step 3: quarterly aggregation with partial-quarter carry-forward
     quarterly: dict[str, float] = {}
+    carry_lv: float | None = None
+    carry_pct: float = 0.0
+    n_partial = 0
+
     for year in range(year_start, year_end + 1):
-        for q, months in [(1, [1, 2, 3]), (2, [4, 5, 6]),
-                          (3, [7, 8, 9]), (4, [10, 11, 12])]:
-            vals = [monthly_index.get((year, m)) for m in months]
-            if all(v is not None for v in vals):
-                quarterly[f"{year}Q{q}"] = round(
-                    (vals[0] * vals[1] * vals[2]) ** (1 / 3), 4
+        for q, q_months in [(1, [1, 2, 3]), (2, [4, 5, 6]),
+                            (3, [7, 8, 9]), (4, [10, 11, 12])]:
+            q_levels: list[float] = []
+            has_published = False
+            is_partial = False
+
+            for month in q_months:
+                ym = (year, month)
+                if ym in monthly_level:
+                    lv = monthly_level[ym]
+                    q_levels.append(lv)
+                    has_published = True
+                    carry_lv = lv
+                    carry_pct = monthly_pct.get(ym, carry_pct)
+                elif has_published and carry_lv is not None:
+                    # Carry forward within a partial quarter
+                    carry_lv = carry_lv * (1 + carry_pct / 100)
+                    q_levels.append(carry_lv)
+                    is_partial = True
+
+            if not q_levels:
+                continue
+
+            period_key = f"{year}Q{q}"
+            product = 1.0
+            for lv in q_levels:
+                product *= lv
+            quarterly[period_key] = round(product ** (1 / len(q_levels)), 4)
+            if is_partial:
+                n_partial += 1
+                logger.info(
+                    "IPCA partial quarter %s: %d/%d months published, carry-forward applied.",
+                    period_key, len(q_levels) - is_partial, 3,
                 )
 
-    logger.info("INPC proxy: %d quarters", len(quarterly))
-    return pd.Series(quarterly, name="inpc_proxy")
+    logger.info("IPCA proxy: %d quarters (%d partial)", len(quarterly), n_partial)
+    return pd.Series(quarterly, name="ipca_proxy")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -245,13 +289,31 @@ def main() -> int:
     all_quarters  = set(ms["quarter"].tolist())
     need_proxy    = all_quarters - have_deflator
 
-    inpc_proxy = pd.Series(dtype=float)
+    ipca_proxy = pd.Series(dtype=float)
     if need_proxy:
         logger.info(
-            "Fetching INPC proxy for %d nowcast quarters: %s",
+            "Fetching IPCA proxy for %d nowcast quarters: %s",
             len(need_proxy), sorted(need_proxy),
         )
-        inpc_proxy = fetch_inpc_quarterly()
+        ipca_proxy = fetch_ipca_quarterly()
+
+        # Calibrate IPCA proxy to CNT deflator level at the last published CNT quarter.
+        # This ensures the real series is continuous across the CNT/proxy boundary and
+        # that YoY comparisons are meaningful.  Without calibration, the two deflators
+        # are on different absolute scales even though both are indexed to 2010=100.
+        if not ipca_proxy.empty:
+            common = sorted(set(cnt_deflator.index) & set(ipca_proxy.index))
+            if common:
+                last_common = common[-1]
+                scale = float(cnt_deflator[last_common]) / float(ipca_proxy[last_common])
+                ipca_proxy = (ipca_proxy * scale).round(4)
+                logger.info(
+                    "IPCA proxy calibrated to CNT deflator at %s (scale=%.4f): "
+                    "last CNT=%.2f, raw IPCA=%.2f",
+                    last_common, scale,
+                    cnt_deflator[last_common],
+                    ipca_proxy[last_common] / scale,
+                )
 
     rows = []
     for _, row in ms.iterrows():
@@ -260,8 +322,8 @@ def main() -> int:
 
         if q in have_deflator:
             defl, is_proxy = float(cnt_deflator[q]), False
-        elif q in inpc_proxy.index:
-            defl, is_proxy = float(inpc_proxy[q]), True
+        elif q in ipca_proxy.index:
+            defl, is_proxy = float(ipca_proxy[q]), True
             logger.info("Using IPCA proxy for %s: deflator=%.4f", q, defl)
         else:
             logger.warning("No deflator available for %s — skipping.", q)

@@ -51,7 +51,12 @@ python pipeline.py --full
 | `output/tables/desvios_trimestre.csv` | CNT vs. estimativa por trimestre |
 | `output/tables/nowcast.csv` | Trimestres provisórios (sem benchmark) |
 | `output/tables/vintage_history.csv` | Histórico de runs e revisões |
+| `output/tables/serie_real.csv` | Série deflacionada a preços de 2010 (deflator implícito CNT; proxy IPCA para nowcast) |
 | `output/UPDATE_REPORT.md` | Relatório do último run |
+
+> **Nota:** `serie_real.csv` deflaciona a **estimativa do modelo**, não a série oficial do IBGE.
+> A divergência entre o crescimento real aqui e o publicado pelo IBGE é igual ao erro de
+> estimação nominal do modelo (~MAPE 2,5% in-sample).
 
 ## Limitações
 
