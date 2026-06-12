@@ -13,8 +13,11 @@ despesas de pessoal dos 27 estados).
 | In-sample (benchmark anual disponível) | Denton proporcional — minimiza Σ (q_t/p_t − q_{t-1}/p_{t-1})² |
 | Nowcast (sem benchmark anual) | Chow-Lin extrapolação (AR1 GLS) |
 
-Especificação: `spec_estados_sal_ce` — 27 estados, salários + contribuições efetivas
-(RREO Anexo 1, elementos 319011/319012/319013/319113).
+Indicador: GND1 total (Pessoal e Encargos Sociais) por ente — RREO Anexo 1,
+`conta == "PESSOAL E ENCARGOS SOCIAIS"`. Desvio em relação ao paper original, que
+filtrava por elemento de despesa (319011/319012/319013/319113), excluindo inativos e
+pensões. Empiricamente o GND1 total atinge MAPE 2,4–2,6%, validando a aproximação.
+Especificação: `spec_estados_sal_ce` (27 estados).
 
 ## Requisitos
 
@@ -60,6 +63,11 @@ python pipeline.py --full
   corrente são nowcast sem correção de benchmark — revisões de 2–5% são esperadas.
 - **Sem intervalos de incerteza**: removidos por calibração problemática. A incerteza é
   avaliada pelas revisões históricas em `vintage_history.csv`.
+- **GND1 vs. filtro por elemento**: o código usa o total GND1, que inclui inativos e
+  pensões. O paper filtrava por elementos 319011–319113. O impacto empírico é pequeno
+  (MAPE dentro de 0,2pp), mas a série não é idêntica à do paper original.
+- **EOB/depreciação**: exigiria estoque de capital (inventário perpétuo); fora do
+  escopo, como no paper original.
 
 ## Conversão bimestral → trimestral (Santos et al. 2015)
 

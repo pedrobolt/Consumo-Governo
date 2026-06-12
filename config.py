@@ -32,7 +32,3 @@ TODOS_ESTADOS = {
     "SP": "35", "TO": "17",
 }
 
-# ── Elementos de despesa (SICONFI) ────────────────────────────────────────────
-ELEMENTOS_SALARIOS         = ["319011", "319012"]
-ELEMENTOS_CONTRIB_EFETIVAS = ["319013", "319113"]
-# Contribuições imputadas: RREO Anexo 4 (RPPS)

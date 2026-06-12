@@ -12,7 +12,10 @@ Single-method pipeline — no ensemble, no prediction intervals:
 - **In-sample** (annual CNT benchmark available): `denton_proportional`
 - **Nowcast** (no annual benchmark yet): `chow_lin` extrapolation via `fit_and_extrapolate`
 
-Best spec fixed at `spec_estados_sal_ce` (27 estados, salários + contrib. efetivas).
+Best spec fixed at `spec_estados_sal_ce` (27 estados, GND1 total — Pessoal e Encargos
+Sociais). Note: code extracts GND1 total via `conta == "PESSOAL E ENCARGOS SOCIAIS"`,
+not element-level filter. This includes inativos/pensões unlike the paper's original
+filter (319011/319012/319013/319113). Empirically validated at MAPE 2.4–2.6%.
 
 ## Key files
 

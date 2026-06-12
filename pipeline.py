@@ -446,6 +446,24 @@ def generate_update_report(model_selected_df: pd.DataFrame,
                 )
             lines.append("")
 
+    # Real growth (if serie_real.csv exists)
+    real_path = OUTPUT_TABLES / "serie_real.csv"
+    if real_path.exists():
+        real_df = pd.read_csv(real_path)
+        real_df = real_df[real_df["var_real_yoy_pct"].notna()]
+        if not real_df.empty:
+            latest_real = real_df.sort_values("quarter").iloc[-1]
+            proxy_note  = " (INPC proxy — deflator not yet published)" if latest_real["deflator_is_proxy"] else ""
+            lines += [
+                "## Real Growth",
+                "",
+                f"- Latest quarter with YoY estimate: **{latest_real['quarter']}**",
+                f"- Real YoY growth: **{latest_real['var_real_yoy_pct']:+.1f}%**{proxy_note}",
+                f"- Nominal: R$ {latest_real['nominal_R_bi']:.2f} bn  |  "
+                  f"Real (base 2010): R$ {latest_real['real_R_bi_base2010']:.2f} bn",
+                "",
+            ]
+
     UPDATE_REPORT_FILE.parent.mkdir(parents=True, exist_ok=True)
     UPDATE_REPORT_FILE.write_text("\n".join(lines), encoding="utf-8")
     logger.info("UPDATE_REPORT.md written.")
