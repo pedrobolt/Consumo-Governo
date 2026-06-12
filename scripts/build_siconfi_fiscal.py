@@ -8,7 +8,11 @@ Reads:
 
 Writes:
     data/raw/siconfi_fiscal.csv
-    Columns: periodo, spec, valor_bi
+        Columns: periodo, spec, valor_bi
+    data/processed/componentes_trimestrais.csv
+        Columns: periodo, componente, valor_bi
+        Components: salarios_ce_estados, salarios_ce_uniao, contrib_imputada
+        (Pre-aggregation indicator decomposition — NOT benchmarked to TRU)
 
 Bimestral to trimestral conversion (Santos et al. 2015):
     Bim 1 → 100% Q1
@@ -105,6 +109,21 @@ def build_specs(uniao: dict, estados: dict, rpps: dict) -> list:
     return rows
 
 
+def build_componentes(uniao: dict, estados: dict, rpps: dict) -> list:
+    """Decompose quarterly indicator into raw components (not benchmarked to TRU)."""
+    all_periods = sorted(set(uniao.keys()) | set(estados.keys()) | set(rpps.keys()))
+    rows = []
+    for (year, q) in all_periods:
+        periodo = f"{year}Q{q}"
+        rows.append({"periodo": periodo, "componente": "salarios_ce_estados",
+                     "valor_bi": round(estados.get((year, q), 0.0), 6)})
+        rows.append({"periodo": periodo, "componente": "salarios_ce_uniao",
+                     "valor_bi": round(uniao.get((year, q), 0.0), 6)})
+        rows.append({"periodo": periodo, "componente": "contrib_imputada",
+                     "valor_bi": round(rpps.get((year, q), 0.0), 6)})
+    return rows
+
+
 def main() -> int:
     uniao = load_rreo(DATA_RAW / "siconfi_rreo_uniao.csv", "Uniao")
     estados = load_rreo(DATA_RAW / "siconfi_rreo_estados.csv", "Estados")
@@ -125,8 +144,17 @@ def main() -> int:
         w = csv.DictWriter(f, fieldnames=["periodo", "spec", "valor_bi"])
         w.writeheader()
         w.writerows(rows)
-
     logger.info("Saved -> %s", out)
+
+    comp_rows = build_componentes(uniao, estados, rpps)
+    comp_dir = ROOT / "data" / "processed"
+    comp_dir.mkdir(parents=True, exist_ok=True)
+    comp_out = comp_dir / "componentes_trimestrais.csv"
+    with open(comp_out, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["periodo", "componente", "valor_bi"])
+        w.writeheader()
+        w.writerows(comp_rows)
+    logger.info("Saved componentes -> %s (%d rows)", comp_out, len(comp_rows))
 
     specs = sorted({r["spec"] for r in rows})
     periods = sorted({r["periodo"] for r in rows})

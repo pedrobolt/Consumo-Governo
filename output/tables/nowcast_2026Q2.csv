@@ -1,5 +1,0 @@
-quarter,estimate_R_bi,actual_CNT_R_bi,error_R_bi,pct_error,model,indicator_coverage,is_provisional
-2026Q1,578.8,598.9941,-20.2,3.37,chow_lin,Bim1+Bim2 fully observed (2 of 2 bimesters for Q1),False
-2026Q2,641.14,,,,chow_lin,Bim2 only (1 of 2 bimesters; Bim3 not yet published; scaled by ratio=0.3136),True
-2026Q1,557.3,598.9941,-41.69,6.96,litterman,Bim1+Bim2 fully observed (2 of 2 bimesters for Q1),False
-2026Q2,615.9,,,,litterman,Bim2 only (1 of 2 bimesters; Bim3 not yet published; scaled by ratio=0.3136),True
